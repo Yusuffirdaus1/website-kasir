@@ -50,7 +50,7 @@
             <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
                 @foreach($products as $product)
                 <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition overflow-hidden">
-                    <img src="{{ $product->image ? asset($product->image) : 'https://via.placeholder.com/300x200' }}" 
+                    <img src="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/300x200' }}" 
                          alt="{{ $product->name }}" 
                          class="w-full h-48 object-cover">
                     <div class="p-4">
