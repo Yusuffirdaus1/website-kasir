@@ -6,6 +6,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 
 // Halaman Publik
@@ -36,6 +37,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/kasir', [DashboardController::class, 'kasir'])->name('kasir.dashboard');
     });
 
+    // Report Routes (Admin & Kasir)
+    Route::middleware('role:admin,kasir')->group(function () {
+        Route::get('/reports', [ReportController::class, 'index'])->name('report.index');
+        Route::get('/reports/print', [ReportController::class, 'print'])->name('report.print');
+    });
+
     // Pelanggan Routes
     Route::middleware('role:pelanggan')->group(function () {
         Route::get('/pelanggan', [DashboardController::class, 'pelanggan'])->name('pelanggan.dashboard');
@@ -50,6 +57,7 @@ Route::middleware('auth')->group(function () {
 
     // Transaction Routes
     Route::post('/checkout', [TransactionController::class, 'checkout'])->name('checkout');
+    Route::get('/transaction/receipt/{id}', [TransactionController::class, 'receipt'])->name('transaction.receipt');
     Route::get('/transaction/success/{id}', [TransactionController::class, 'success'])->name('transaction.success');
     Route::get('/transaction/history', [TransactionController::class, 'history'])->name('transaction.history');
 });

@@ -93,20 +93,50 @@
                             </div>
                         </div>
 
-                        <form action="{{ route('checkout') }}" method="POST">
+                        <form action="{{ route('checkout') }}" method="POST" id="checkoutForm">
                             @csrf
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Metode Pembayaran</label>
-                                <select name="payment_method" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
-                                    <option value="cash">Cash</option>
+                                <select name="payment_method" id="paymentMethod" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+                                    <option value="cash">Cash / Tunai</option>
                                     <option value="debit">Debit Card</option>
                                     <option value="credit">Credit Card</option>
                                     <option value="qris">QRIS</option>
                                 </select>
                             </div>
 
-                            <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold">
-                                Checkout
+                            <!-- Cash Payment Section (shown only when cash is selected) -->
+                            <div id="cashPaymentSection" class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Jumlah Uang Dibayar</label>
+                                <input type="number" name="cash_amount" id="cashAmount" min="0" step="1000" 
+                                       value="{{ $total }}"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                                       placeholder="Masukkan jumlah uang">
+                                
+                                <!-- Change Display -->
+                                <div id="changeDisplay" class="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg hidden">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm font-medium text-gray-700">Kembalian:</span>
+                                        <span id="changeAmount" class="text-lg font-bold text-green-600">Rp 0</span>
+                                    </div>
+                                </div>
+
+                                <!-- Quick Cash Buttons -->
+                                <div class="mt-3 grid grid-cols-3 gap-2">
+                                    <button type="button" onclick="setAmount({{ $total }})" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded text-sm font-medium">
+                                        Pas
+                                    </button>
+                                    <button type="button" onclick="setAmount({{ ceil($total / 10000) * 10000 }})" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded text-sm font-medium">
+                                        Rp {{ number_format(ceil($total / 10000) * 10000, 0, ',', '.') }}
+                                    </button>
+                                    <button type="button" onclick="setAmount({{ ceil($total / 50000) * 50000 }})" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded text-sm font-medium">
+                                        Rp {{ number_format(ceil($total / 50000) * 50000, 0, ',', '.') }}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button type="submit" id="checkoutBtn" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold">
+                                Proses Pembayaran
                             </button>
                         </form>
 
@@ -118,4 +148,70 @@
             </div>
         @endif
     </div>
+
+    <script>
+        const totalAmount = {{ $total }};
+        const paymentMethodSelect = document.getElementById('paymentMethod');
+        const cashPaymentSection = document.getElementById('cashPaymentSection');
+        const cashAmountInput = document.getElementById('cashAmount');
+        const changeDisplay = document.getElementById('changeDisplay');
+        const changeAmountSpan = document.getElementById('changeAmount');
+        const checkoutForm = document.getElementById('checkoutForm');
+
+        // Toggle cash payment section
+        paymentMethodSelect.addEventListener('change', function() {
+            if (this.value === 'cash') {
+                cashPaymentSection.style.display = 'block';
+                cashAmountInput.required = true;
+            } else {
+                cashPaymentSection.style.display = 'none';
+                cashAmountInput.required = false;
+                cashAmountInput.value = totalAmount;
+            }
+        });
+
+        // Calculate change
+        cashAmountInput.addEventListener('input', function() {
+            const cashAmount = parseFloat(this.value) || 0;
+            const change = cashAmount - totalAmount;
+
+            if (change >= 0) {
+                changeDisplay.classList.remove('hidden');
+                changeAmountSpan.textContent = 'Rp ' + formatNumber(change);
+                changeAmountSpan.classList.remove('text-red-600');
+                changeAmountSpan.classList.add('text-green-600');
+            } else {
+                changeDisplay.classList.remove('hidden');
+                changeAmountSpan.textContent = 'Uang kurang: Rp ' + formatNumber(Math.abs(change));
+                changeAmountSpan.classList.remove('text-green-600');
+                changeAmountSpan.classList.add('text-red-600');
+            }
+        });
+
+        // Validate form before submit
+        checkoutForm.addEventListener('submit', function(e) {
+            if (paymentMethodSelect.value === 'cash') {
+                const cashAmount = parseFloat(cashAmountInput.value) || 0;
+                if (cashAmount < totalAmount) {
+                    e.preventDefault();
+                    alert('Jumlah uang tidak cukup! Masih kurang Rp ' + formatNumber(totalAmount - cashAmount));
+                    return false;
+                }
+            }
+        });
+
+        // Set amount helper
+        function setAmount(amount) {
+            cashAmountInput.value = amount;
+            cashAmountInput.dispatchEvent(new Event('input'));
+        }
+
+        // Format number helper
+        function formatNumber(num) {
+            return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        // Initialize
+        paymentMethodSelect.dispatchEvent(new Event('change'));
+    </script>
 </x-layouts.app>

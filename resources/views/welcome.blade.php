@@ -10,36 +10,54 @@
     <!-- Search Bar -->
     <div class="bg-white shadow-md">
         <div class="max-w-7xl mx-auto px-4 py-4">
-            <div class="flex gap-4">
-                <input type="text" placeholder="Cari produk..." 
+            <form action="{{ route('home') }}" method="GET" class="flex gap-4">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari produk..." 
                        class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
-                <button class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
                     Cari
                 </button>
-            </div>
+                @if(request('search') || request('category'))
+                    <a href="{{ route('home') }}" class="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">
+                        Reset
+                    </a>
+                @endif
+            </form>
         </div>
     </div>
 
     <!-- Kategori -->
     <div class="max-w-7xl mx-auto px-4 py-12">
         <h2 class="text-2xl font-bold mb-8 text-gray-800">Pilih Kategori</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition group cursor-pointer">
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-6">
+            <!-- All Categories -->
+            <a href="{{ route('home') }}" class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition group cursor-pointer {{ !request('category') ? 'ring-2 ring-blue-600' : '' }}">
+                <div class="text-5xl mb-4 text-center group-hover:scale-110 transition">🛒</div>
+                <h3 class="text-center font-medium text-gray-800 text-lg">Semua</h3>
+            </a>
+            
+            <!-- Minuman -->
+            <a href="{{ route('home', ['category' => 'Minuman']) }}" class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition group cursor-pointer {{ request('category') === 'Minuman' ? 'ring-2 ring-blue-600' : '' }}">
                 <div class="text-5xl mb-4 text-center group-hover:scale-110 transition">🥤</div>
                 <h3 class="text-center font-medium text-gray-800 text-lg">Minuman</h3>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition group cursor-pointer">
+            </a>
+            
+            <!-- Makanan -->
+            <a href="{{ route('home', ['category' => 'Makanan']) }}" class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition group cursor-pointer {{ request('category') === 'Makanan' ? 'ring-2 ring-blue-600' : '' }}">
                 <div class="text-5xl mb-4 text-center group-hover:scale-110 transition">🍪</div>
                 <h3 class="text-center font-medium text-gray-800 text-lg">Makanan</h3>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition group cursor-pointer">
+            </a>
+            
+            <!-- Perawatan -->
+            <a href="{{ route('home', ['category' => 'Perawatan']) }}" class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition group cursor-pointer {{ request('category') === 'Perawatan' ? 'ring-2 ring-blue-600' : '' }}">
                 <div class="text-5xl mb-4 text-center group-hover:scale-110 transition">🧴</div>
                 <h3 class="text-center font-medium text-gray-800 text-lg">Perawatan</h3>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition group cursor-pointer">
+            </a>
+            
+            <!-- Lainnya -->
+            <a href="{{ route('home', ['category' => 'Lainnya']) }}" class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition group cursor-pointer {{ request('category') === 'Lainnya' ? 'ring-2 ring-blue-600' : '' }}">
                 <div class="text-5xl mb-4 text-center group-hover:scale-110 transition">📦</div>
                 <h3 class="text-center font-medium text-gray-800 text-lg">Lainnya</h3>
-            </div>
+            </a>
         </div>
     </div>
 

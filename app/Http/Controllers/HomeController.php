@@ -3,14 +3,30 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // ambil produk (bisa paginasi nanti)
-        $products = Product::latest()->take(12)->get();
+        $query = Product::query();
 
-        return view('welcome', compact('products'));
+        // Filter by category if provided
+        if ($request->has('category') && $request->category != '') {
+            $query->where('category', $request->category);
+        }
+
+        // Search functionality
+        if ($request->has('search') && $request->search != '') {
+            $query->where(function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('description', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        $products = $query->latest()->get();
+        $selectedCategory = $request->category;
+
+        return view('welcome', compact('products', 'selectedCategory'));
     }
 }

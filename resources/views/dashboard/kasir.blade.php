@@ -71,6 +71,9 @@
                     <a href="{{ route('home') }}" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
                         Lihat Katalog Produk
                     </a>
+                    <a href="{{ route('report.index') }}" class="px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition">
+                        📊 Laporan Penjualan
+                    </a>
                 </div>
             </div>
 

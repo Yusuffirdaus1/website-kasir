@@ -13,7 +13,10 @@ class Transaction extends Model
         'user_id',
         'kasir_id',
         'transaction_code',
+        'invoice_number',
         'total_amount',
+        'cash_amount',
+        'change_amount',
         'status',
         'payment_method',
     ];
